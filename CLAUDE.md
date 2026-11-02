@@ -58,6 +58,17 @@ this GitHub repo through jsDelivr. There is no server code here.
     parts show, source label; bundled + re-read at runtime like pagesetting).
   - All links open in a new tab (`rel=noopener`, sr-only "(opens in a new tab)");
     only http(s) URLs become links. Same WCAG rules as pagesetting.
+  - **Live refresh:** the server render can be stale (MindTouch caches the rendered
+    page; tag changes made through the API don't refresh it), so after drawing it the
+    JS reads the page's **current tags** (`/@api/deki/pages/{id}/tags`, page id from
+    `.ab-data .ab-page`) and, if they differ, looks up only the new keys in the browser
+    (`<AUTHORS_API_HOST>/api/v1/authors/key/<key>`, same group/`members` handling,
+    `src/api.ts`) and redraws; each person carries its `tagKey` so known people are
+    reused. Tags map to roles by **longest prefix first**. Page settings' `putTags`
+    dispatches `document` event `cps:tags-saved` `{ pageId, tags }`, and badges for
+    that page redraw at once. `AUTHORS_API_HOST` comes from `authorbadge/.env` at build
+    time (`scripts/env.mjs`, copied from pagesetting; default `https://knitcanvas.fun`)
+    - keep it the same as the template's constant.
   - `loader.html` loads the dist files only on pages with a badge (`.ab-root`); dev
     switch `localStorage.abDev`. `currentdeki.dekiscript` is the old badge, kept for
     reference. `demo.html` shows the cases.

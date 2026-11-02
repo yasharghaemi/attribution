@@ -2,6 +2,7 @@
 // and a checked copy of authorbadge.json (the build fails if it isn't valid JSON).
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
+import { buildDefines } from './env.mjs';
 
 await esbuild.build({
   entryPoints: ['src/index.ts'],
@@ -12,6 +13,7 @@ await esbuild.build({
   sourcemap: true,
   legalComments: 'none',
   outfile: 'dist/authorbadge.min.js',
+  define: buildDefines(), // AUTHORS_API_HOST from .env
   logLevel: 'info',
 });
 await esbuild.build({

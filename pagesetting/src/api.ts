@@ -45,6 +45,10 @@ export function putTags(pageId: number | string, tags: string[]): Promise<Respon
   return deki('PUT', `/pages/${pageId}/tags`, {
     body: new XMLSerializer().serializeToString(doc),
     type: 'application/xml',
+  }).then((res) => {
+    // Tell anything on the page that shows tags (e.g. the author badge) to update.
+    document.dispatchEvent(new CustomEvent('cps:tags-saved', { detail: { pageId: Number(pageId), tags } }));
+    return res;
   });
 }
 

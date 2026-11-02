@@ -63,6 +63,7 @@ var PAD = "                    ";
                         }
                         <span class="ab-person" hidden="hidden"> json.emit({
                             role: role.prefix,
+                            tagKey: key,
                             key: p.nameKey ?? key,
                             name: p.name ?? p.nameKey ?? key,
                             nameURL: p.nameURL ?? "",
@@ -80,6 +81,8 @@ var PAD = "                    ";
     }
     </ul>
     <div class="ab-data" hidden="hidden">
+        // The page id lets the script re-read the page's current tags (live refresh).
+        <span class="ab-page"> page.id </span>
         // "avatar@" and "source@" are both 7 characters long.
         foreach (var tag in tagList where string.tolower(string.substr(tag.value.name .. PAD, 0, 7)) == "avatar@") {
             <span class="ab-avatar"> string.substr(tag.value.name, 7) </span>

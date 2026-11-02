@@ -5,6 +5,8 @@
  */
 export interface Person {
   role: string;
+  /** The key in the page tag (a group's key; its members have their own `key`). */
+  tagKey?: string;
   key: string;
   name: string;
   nameURL?: string;
@@ -24,4 +26,6 @@ export interface BadgeData {
   avatars: string[];
   /** source@<value> tags. */
   sources: string[];
+  /** The page's id (for the live refresh); 0 if the template didn't give it. */
+  pageId: number;
 }

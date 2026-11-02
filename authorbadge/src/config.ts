@@ -25,6 +25,8 @@ export interface Settings {
 // runtime copy before anything is rendered.
 const bundled = bundledSettings as unknown as Settings;
 export let LABEL: string = bundled.label;
+/** Authors API host, from AUTHORS_API_HOST in .env at build time (scripts/env.mjs). */
+export const AUTHORS_API_HOST: string = __AUTHORS_API_HOST__;
 export let ROLES: RoleConfig[] = bundled.roles;
 export let SHOW: Settings['show'] = bundled.show;
 export let SOURCE_LABEL: string = bundled.sourceLabel;
