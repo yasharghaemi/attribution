@@ -38,11 +38,19 @@ this GitHub repo through jsDelivr. There is no server code here.
     the **server**: for the legacy `authorname:<key>` tag and every attribution tag
     (`author@`, `editor@`, … `reviewedBy@`, and the `book…@` ones) it calls
     `<AUTHORS_API_HOST>/api/v1/authors/key/<key>` with `web.json(…, 86400, true)`
-    (cached 24h; a failure shows the key). One key may return **several people**
-    (`{ author }`, `{ authors: [] }` or a list). It writes a no-JS `.ab-fallback` list
+    (cached 24h; a failure shows the key). One key may return **several people**: a
+    group answers `{ err, author: { name: "A, B", members: [ {nameKey, name, …}, … ] } }`
+    and each **member** gets its own card under its own `nameKey` (the group's joined
+    name isn't shown); a single person is `{ err, author: {…} }`; `{ authors: [] }` or a
+    list are accepted too. It writes a no-JS `.ab-fallback` list
     (each item with a hidden `.ab-person` JSON) and a hidden `.ab-data` with
     `avatar@` / `source@` values. `AUTHORS_API_HOST` and the role list are constants at
     the top of the template — keep the role prefixes in sync with `authorbadge.json`.
+    Tag matching is by exact prefix: the first `size` characters (prefix length, written
+    out per role) of the tag padded with spaces, compared case-insensitively; the key is
+    cut off by position. Book roles are checked first. Don't use `string.contains` /
+    `string.replace` for this - `bookauthor@key` would match `author@` and become
+    `bookkey`.
   - `src/`: `index.ts` mounts every `.ab-root` (dedupes, sorts by role order, puts
     `avatar@` pictures on the legacy author's card), `card.ts`, `carousel.ts`
     (scroll-snap row + Previous/Next, disabled at the ends, hidden when all fits),
@@ -98,6 +106,11 @@ loader's `BASE`; a branch URL (`@main`) is cached by jsDelivr for up to ~12 h.
   `credentials: 'same-origin'`, so the session cookie authenticates them.
 - **DekiScript reads `-` as subtraction** in XML-literal attribute names, so no
   `data-*` attributes there. Emit data as JSON text (`json.emit(...)`) instead.
+- **DekiScript syntax:** HTML in a template is XML, so every tag must be closed
+  (`<link … />`); and an output expression inside markup needs a `;` when another
+  statement follows (`" (" .. label .. ")"; if (…) {…}`), or the next `if` is a
+  parse error. `list.count(x)` fails: it needs a condition argument - avoid counting
+  (decide from the data's shape instead).
 - **Save tasks resolve to a fetch `Response`**, whose `.text` is a function. The save
   queue in `panel.ts` only shows a task's own message when it's a real `SaveResult`
   (`typeof text === 'string'`); otherwise "Saved". (Getting this wrong showed

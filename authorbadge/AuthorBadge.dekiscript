@@ -1,71 +1,70 @@
-/***
- * Template:Custom/Views/AuthorBadge - the modern author badge.
- *
- * Replaces the old badge (currentdeki.dekiscript): call it where the old one was.
- * Reads the page's author tags - the legacy authorname:<key> plus the attribution tags
- * (author@, editor@, ..., and the book* ones) - looks each key up on the authors API
- * (on the server, cached 24h; an outage never breaks the page) and writes:
- *   - .ab-fallback: a plain list that shows when the script doesn't run. Each item
- *     carries the person's data as JSON in a hidden .ab-person element;
- *   - .ab-data (hidden): avatar@ pictures and source@ values.
- * authorbadge.min.js (loaded by authorbadge/loader.html) turns it into a carousel.
- *
- * The API may answer one key with several people: { author: {...} },
- * { authors: [ ... ] } or a plain list are all accepted.
- ***/
+// Badge styles + script. In DekiScript, HTML is XML: every tag must be closed (<link ... />).
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@bc773d3/authorbadge/dist/authorbadge.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@bc773d3/authorbadge/dist/authorbadge.min.js" async="async"></script>
 
 var AUTHORS_API_HOST = "https://knitcanvas.fun";
 
-// Tags that make badges, in display order. Keep the prefixes in sync with "roles" in
-// authorbadge.json (the labels here are only for the no-script list).
+// Tags that make badges. Keep the prefixes in sync with "roles" in authorbadge.json,
+// which also sets the display order (the labels here are only for the no-script list).
+// Book roles come first, and a tag only matches when it *starts with* the prefix
+// (compared on the first `size` characters, then the key is cut off by position), so
+// "bookauthor@key" is a Book Author and never an author@ with key "bookkey".
+// `size` is the prefix length - written out, so no string-length function is needed.
 var ROLES = [
-    { prefix: "authorname:", label: "Author" },
-    { prefix: "author@", label: "Author" },
-    { prefix: "editor@", label: "Editor" },
-    { prefix: "remixer@", label: "Remixer" },
-    { prefix: "translator@", label: "Translator" },
-    { prefix: "contributor@", label: "Contributor" },
-    { prefix: "illustrator@", label: "Illustrator" },
-    { prefix: "reviewedBy@", label: "Reviewer" },
-    { prefix: "bookauthor@", label: "Book Author" },
-    { prefix: "bookeditor@", label: "Book Editor" },
-    { prefix: "bookremixer@", label: "Book Remixer" },
-    { prefix: "booktranslator@", label: "Book Translator" },
-    { prefix: "bookcontributor@", label: "Book Contributor" },
-    { prefix: "bookillustrator@", label: "Book Illustrator" },
-    { prefix: "bookreviewedBy@", label: "Book Reviewer" }
+    { prefix: "bookauthor@",      size: 11, label: "Book Author" },
+    { prefix: "bookeditor@",      size: 11, label: "Book Editor" },
+    { prefix: "bookremixer@",     size: 12, label: "Book Remixer" },
+    { prefix: "booktranslator@",  size: 15, label: "Book Translator" },
+    { prefix: "bookcontributor@", size: 16, label: "Book Contributor" },
+    { prefix: "bookillustrator@", size: 16, label: "Book Illustrator" },
+    { prefix: "bookreviewedBy@",  size: 15, label: "Book Reviewer" },
+    { prefix: "authorname:",      size: 11, label: "Author" },
+    { prefix: "author@",          size:  7, label: "Author" },
+    { prefix: "editor@",          size:  7, label: "Editor" },
+    { prefix: "remixer@",         size:  8, label: "Remixer" },
+    { prefix: "translator@",      size: 11, label: "Translator" },
+    { prefix: "contributor@",     size: 12, label: "Contributor" },
+    { prefix: "illustrator@",     size: 12, label: "Illustrator" },
+    { prefix: "reviewedBy@",      size: 11, label: "Reviewer" }
 ];
 
 var tagList = map.keyvalues(page.tags);
+// Padding so a tag shorter than a prefix can still be cut to the prefix's length.
+var PAD = "                    ";
 
 <div class="ab-root">
     <ul class="ab-fallback">
     foreach (var role in ROLES) {
-        foreach (var tag in tagList where string.startswith(tag.value.name, role.prefix, true)) {
-            var key = string.replace(tag.value.name, role.prefix, "", true);
+        foreach (var tag in tagList where string.tolower(string.substr(tag.value.name .. PAD, 0, role.size)) == string.tolower(role.prefix)) {
+            var key = string.substr(tag.value.name, role.size);
             if (key != "" && key != "ck12") {
                 // nilIfMissing=true: a failed call gives nil, and the key is shown instead.
                 var data = web.json(AUTHORS_API_HOST .. "/api/v1/authors/key/" .. key, 86400, true);
-                var found = data is list ? data
-                    : (data is map && data.err == false
-                        ? (data.authors is list ? data.authors : (data.author is map ? [ data.author ] : []))
-                        : []);
-                var persons = list.count(found) > 0 ? found : [ { name: key } ];
+                // A group comes back as one "author" whose people are in "members" (its
+                // own name is just their names joined): show each member instead.
+                // { authors: [ ... ] } or a plain list are accepted too.
+                // (No list.count here: in DekiScript it needs a condition argument.)
+                var author = data is map && data.err == false && data.author is map ? data.author : nil;
+                var persons = data is list ? data
+                    : (data is map && data.err == false && data.authors is list ? data.authors
+                    : (author != nil ? (author.members is list ? author.members : [ author ])
+                    : [ { name: key } ]));
                 foreach (var p in persons) {
                     <li>
                         if (p.nameURL) {
-                            <a href=(p.nameURL) target="_blank" rel="noopener"> p.name ?? key </a>
+                            <a href=(p.nameURL) target="_blank" rel="noopener"> p.name ?? p.nameKey ?? key </a>
                         } else {
-                            p.name ?? key
+                            p.name ?? p.nameKey ?? key;
                         }
-                        " (" .. role.label .. ")"
+                        // An output expression needs ";" before the next statement.
+                        " (" .. role.label .. ")";
                         if (p.campusName) {
-                            ", " .. p.campusName
+                            ", " .. p.campusName;
                         }
                         <span class="ab-person" hidden="hidden"> json.emit({
                             role: role.prefix,
-                            key: key,
-                            name: p.name ?? key,
+                            key: p.nameKey ?? key,
+                            name: p.name ?? p.nameKey ?? key,
                             nameURL: p.nameURL ?? "",
                             pictureURL: p.pictureURL ?? "",
                             pictureCircle: p.pictureCircle ?? "",
@@ -81,11 +80,12 @@ var tagList = map.keyvalues(page.tags);
     }
     </ul>
     <div class="ab-data" hidden="hidden">
-        foreach (var tag in tagList where string.startswith(tag.value.name, "avatar@", true)) {
-            <span class="ab-avatar"> string.replace(tag.value.name, "avatar@", "", true) </span>
+        // "avatar@" and "source@" are both 7 characters long.
+        foreach (var tag in tagList where string.tolower(string.substr(tag.value.name .. PAD, 0, 7)) == "avatar@") {
+            <span class="ab-avatar"> string.substr(tag.value.name, 7) </span>
         }
-        foreach (var tag in tagList where string.startswith(tag.value.name, "source@", true)) {
-            <span class="ab-source"> string.replace(tag.value.name, "source@", "", true) </span>
+        foreach (var tag in tagList where string.tolower(string.substr(tag.value.name .. PAD, 0, 7)) == "source@") {
+            <span class="ab-source"> string.substr(tag.value.name, 7) </span>
         }
     </div>
 </div>
