@@ -1,6 +1,6 @@
 // Badge styles + script. In DekiScript, HTML is XML: every tag must be closed (<link ... />).
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@bc773d3/authorbadge/dist/authorbadge.min.css" />
-<script src="https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@bc773d3/authorbadge/dist/authorbadge.min.js" async="async"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yasharghaemi/attribution@76382e8/authorbadge/dist/authorbadge.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/yasharghaemi/attribution@76382e8/authorbadge/dist/authorbadge.min.js" async="async"></script>
 
 var AUTHORS_API_HOST = "https://knitcanvas.fun";
 

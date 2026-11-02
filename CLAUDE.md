@@ -106,7 +106,7 @@ commit the updated `dist/` files together with the source change.
 Don't paste the bundle into MindTouch templates (it would ship in every page's HTML
 and pasted text gets mangled). The site has `loader.html` pasted once into Custom
 HTML; it loads
-`https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@<commit>/pagesetting/dist/pagesetting.min.{js,css}`
+`https://cdn.jsdelivr.net/gh/yasharghaemi/attribution@<commit>/pagesetting/dist/pagesetting.min.{js,css}`
 only in the editor. After pushing, tell the user the new commit hash to put in the
 loader's `BASE`; a branch URL (`@main`) is cached by jsDelivr for up to ~12 h.
 
