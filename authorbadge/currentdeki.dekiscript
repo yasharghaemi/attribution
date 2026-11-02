@@ -1,0 +1,116 @@
+var tagList = map.keyvalues(page.tags);
+var authorName = '';
+var sectionauthorTitle = ''; 
+var sectionsource = ''; 
+var sectionauthorLong = '';
+var sectionlicense= '';
+var sectionlicensenumber= '';
+var sectionlicenseURL= '';
+var avatarURL= '';
+
+// Author information is fetched per-page from LibreTexts Commons (see the authorname: block below).
+// The previous inline `authors` object (~3000 keys, loaded on every render) has been retired.
+
+// Look through the page's tag list, find the one for local 'author@' metatags, display the bar with the correct information
+foreach(var tag in tagList where string.contains(tag.key, 'author@')) {
+    var sectionauthorName = string.replace(tag.key, 'author@', '', true);
+    
+    if (sectionauthorTitle==''){
+        sectionauthorTitle = sectionauthorName;
+    } else {
+        if (sectionauthorLong =='') {
+            sectionauthorLong  = ""..sectionauthorTitle..", "..sectionauthorName.."";
+            sectionauthorTitle = ""..sectionauthorTitle.." & "..sectionauthorName.."";
+        } else {
+            sectionauthorTitle = ""..sectionauthorLong..", & "..sectionauthorName.."";
+            sectionauthorLong  = ""..sectionauthorLong..", "..sectionauthorName.."";
+        }
+    }
+}
+
+foreach(var tag in tagList where string.contains(tag.key, 'source@')) {
+    var sectionsource = string.replace(tag.key, 'source@', '', true);
+}
+ 
+// Look through the page's tag list, find the one for 'authorname', display the bar with the correct information
+foreach(var tag in tagList where string.contains(tag.key, 'authorname:')) {
+    var authorName = string.replace(tag.value.name, 'authorname:', '', true);
+    if(authorName !="ck12") {
+
+        // Fetch this author's record from Commons, cached server-side for up to 24h (ttl=86400).
+        // nilIfMissing=true => a failed/unreachable request returns nil instead of erroring, so a
+        // Commons outage never breaks the page; we simply skip the author-specific rows below.
+        var authorData = web.json('https://commons.libretexts.org/api/v1/authors/key/' .. authorName, 86400, true);
+        //var authorData = web.json('https://knitcanvas.fun/api/v1/authors/key/' .. authorName, 86400, true);
+        var author = nil;
+        if (authorData != nil) {
+            if (authorData.err == false) {
+                author = authorData.author;
+            }
+        }
+
+        <div class="mt-author-container">
+            <ul>
+                // Only show the image if there is a URL defined
+               if (author.pictureURL) {
+                  if (author.pictureCircle=='no') {
+                    <li class="mt-author-image mt-author-image-crop-nocircle"><img src=(author.pictureURL) alt=" " title=(author.name) /></li>
+                    foreach(var tag in tagList where string.contains(tag.key, 'avatar@')) {
+                        var avatarURL = string.replace(tag.key, 'avatar@', '', true);
+                        <li class="mt-author-image mt-author-image-crop-nocircle"><img src=(avatarURL)/></li>
+                    }
+                  } else {
+                    <li class="mt-author-image mt-author-image-crop"><img src=(author.pictureURL) alt=" " title=(author.name) /></li>
+                    foreach(var tag in tagList where string.contains(tag.key, 'avatar@')) {
+                        var avatarURL = string.replace(tag.key, 'avatar@', '', true);
+                        <li class="mt-author-image mt-author-image-crop"><img src=(avatarURL)/></li>
+                    }
+                  }
+                }
+
+                // Only show this section if a sectionauthors are(is) set
+                <li class="mt-author-information">
+                if(sectionauthorTitle!='') {
+                    <span> sectionauthorTitle </span>
+                } else {
+                    if (author.nameURL) {
+                        <a rel="external" target="_blank" href=(author.nameURL)> author.name</a>
+                    } else {
+                        author.name
+                    }
+                }
+                </li>
+
+                // Only show this section if a campusName (formerly companyName) is set
+                if(author.campusName) {
+                    <li class="mt-author-companyname">
+                    if (author.campusURL) {
+                        <a rel="external" target="_blank" href=(author.campusURL)> author.campusName </a>
+                    } else {
+                        <span> author.campusName </span>
+                    }
+                    if(author.programName) {
+                        <span class="mt-author-written"> ' via ' </span>
+                        if(author.programURL){
+                            <a rel="external" target="_blank" href=(author.programURL)> author.programName </a>
+                        } else {
+                            author.programName;
+                        }
+                    }
+                    </li>
+                } else {
+                        // Only show this section if a programname is set
+                    if (author.programName) {
+                        <li class="mt-author-programname">
+                        if(author.programURL){
+                            <a rel="external" target="_blank" href=(author.programURL)> author.programName </a>
+                        } else {
+                            author.programName;
+                        }
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+}

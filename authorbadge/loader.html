@@ -1,0 +1,56 @@
+<!--
+  Author badge loader: paste this (and only this) into Control Panel > Branding >
+  Custom HTML, next to the pagesetting loader. The badge itself comes from the
+  Custom/Views/AuthorBadge template; this only loads its script and styles, and only on
+  pages that actually have a badge (.ab-root). After each push, replace the commit
+  hash in RELEASE.
+
+  Dev mode (only for your own browser): run `npm run dev` in authorbadge/ (port 8001),
+  then in the browser console run   localStorage.abDev = 1   and reload. For a
+  CodeSandbox Devbox use   localStorage.abDev = 'https://<devbox>-8001.csb.app/'.
+  Turn it off with   delete localStorage.abDev   If the dev server isn't reachable, the
+  released files are used instead.
+-->
+<script>
+(function () {
+  var RELEASE = 'https://cdn.jsdelivr.net/gh/yasharghaemi/test-JS@COMMIT_HASH/authorbadge/dist/';
+  var flag = null;
+  try { flag = localStorage.getItem('abDev'); } catch (e) { /* storage blocked */ }
+  var dev = flag === '1' || /^https?:\/\//.test(flag || '');
+  var DEV = /^https?:\/\//.test(flag || '') ? flag.replace(/\/?$/, '/') : 'http://localhost:8001/';
+
+  var loaded = false;
+  function add(tag, props) {
+    var node = document.createElement(tag);
+    for (var k in props) node[k] = props[k];
+    document.head.appendChild(node);
+    return node;
+  }
+  function loadFrom(base, min) {
+    var css = add('link', { rel: 'stylesheet', href: base + 'authorbadge' + min + '.css' });
+    var js = add('script', { src: base + 'authorbadge' + min + '.js', async: true });
+    return { css: css, js: js };
+  }
+  function load() {
+    if (loaded) return;
+    loaded = true;
+    if (!dev) return loadFrom(RELEASE, '.min');
+    console.info('[author-badge] dev mode: loading from ' + DEV);
+    var files = loadFrom(DEV, '');
+    files.js.onerror = function () {
+      console.warn('[author-badge] dev server not reachable; using the released files');
+      files.css.remove();
+      loadFrom(RELEASE, '.min');
+    };
+  }
+
+  if (document.querySelector('.ab-root')) return load();
+  var watch = new MutationObserver(function () {
+    if (document.querySelector('.ab-root')) {
+      watch.disconnect();
+      load();
+    }
+  });
+  watch.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>

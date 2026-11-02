@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Author badge demo</title>
+    <link rel="stylesheet" href="./dist/authorbadge.min.css" />
+    <style>body { max-width: 900px; margin: 24px auto; padding: 0 16px; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <h1>Author badge demo</h1>
+    <p>What AuthorBadge.dekiscript writes; authorbadge.min.js turns it into a carousel.
+       Cases: legacy authorname: with an avatar@ picture, an author@ key the API answers
+       with two people, a failed lookup (shown by its key), a duplicate, book roles and a
+       source@ link.</p>
+
+    <div class="ab-root">
+        <ul class="ab-fallback">
+            <li><a href="https://example.org/delmar" target="_blank" rel="noopener">Delmar Larsen</a> (Author), UC Davis
+                <span class="ab-person" hidden>{"role":"authorname:","key":"delmar","name":"Delmar Larsen","nameURL":"https://example.org/delmar","pictureURL":"https://picsum.photos/seed/delmar/96","pictureCircle":"","campusName":"UC Davis","campusURL":"https://www.ucdavis.edu","programName":"LibreTexts","programURL":"https://libretexts.org"}</span></li>
+            <li>Ann Smith (Author)
+                <span class="ab-person" hidden>{"role":"author@","key":"smith-jones","name":"Ann Smith","nameURL":"","pictureURL":"https://picsum.photos/seed/ann/96","pictureCircle":"no","campusName":"Open University","campusURL":"","programName":"","programURL":""}</span></li>
+            <li>Bo Jones (Author)
+                <span class="ab-person" hidden>{"role":"author@","key":"smith-jones","name":"Bo Jones","nameURL":"https://example.org/bo","pictureURL":"","pictureCircle":"","campusName":"","campusURL":"","programName":"OER Program","programURL":"https://example.org/oer"}</span></li>
+            <li>Bo Jones (Author)
+                <span class="ab-person" hidden>{"role":"author@","key":"smith-jones","name":"Bo Jones","nameURL":"https://example.org/bo","pictureURL":"","pictureCircle":"","campusName":"","campusURL":"","programName":"OER Program","programURL":"https://example.org/oer"}</span></li>
+            <li>Yashar Ghaemi (Editor)
+                <span class="ab-person" hidden>{"role":"editor@","key":"yashar-ghaemi","name":"Yashar Ghaemi","nameURL":"https://example.org/yashar","pictureURL":"https://picsum.photos/seed/yashar/96","pictureCircle":"","campusName":"LibreTexts","campusURL":"https://libretexts.org","programName":"","programURL":""}</span></li>
+            <li>unknown-key (Translator)
+                <span class="ab-person" hidden>{"role":"translator@","key":"unknown-key","name":"unknown-key","nameURL":"","pictureURL":"","pictureCircle":"","campusName":"","campusURL":"","programName":"","programURL":""}</span></li>
+            <li>Jane Doe (Book Author)
+                <span class="ab-person" hidden>{"role":"bookauthor@","key":"jane-doe","name":"Jane Doe","nameURL":"https://example.org/jane","pictureURL":"https://picsum.photos/seed/jane/96","pictureCircle":"","campusName":"State College","campusURL":"https://example.org/state","programName":"","programURL":""}</span></li>
+            <li>Jake Turner (Book Editor)
+                <span class="ab-person" hidden>{"role":"bookeditor@","key":"jake-turner","name":"Jake Turner","nameURL":"","pictureURL":"","pictureCircle":"","campusName":"","campusURL":"","programName":"","programURL":""}</span></li>
+        </ul>
+        <div class="ab-data" hidden>
+            <span class="ab-avatar">https://picsum.photos/seed/avatar/96</span>
+            <span class="ab-source">https://example.org/original-book</span>
+        </div>
+    </div>
+
+    <script src="./dist/authorbadge.min.js"></script>
+</body>
+</html>

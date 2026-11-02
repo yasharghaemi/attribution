@@ -30,6 +30,30 @@ this GitHub repo through jsDelivr. There is no server code here.
     template; writes page data as JSON into a hidden `#cps-data` element.
   - `demo.html` — local test page with a fake `/@api/deki` (via a `fetch` override).
 
+- `authorbadge/` — the modern **author badge** shown on pages: a horizontal carousel
+  of person cards. Separate project built the same way as `pagesetting/` (TypeScript +
+  esbuild, `npm run build` / `npm run dev` on **port 8001** / `npm run typecheck`,
+  committed `dist/authorbadge.min.{js,css}` + `authorbadge.json`).
+  - `AuthorBadge.dekiscript` (template `Custom/Views/AuthorBadge`) does the lookups on
+    the **server**: for the legacy `authorname:<key>` tag and every attribution tag
+    (`author@`, `editor@`, … `reviewedBy@`, and the `book…@` ones) it calls
+    `<AUTHORS_API_HOST>/api/v1/authors/key/<key>` with `web.json(…, 86400, true)`
+    (cached 24h; a failure shows the key). One key may return **several people**
+    (`{ author }`, `{ authors: [] }` or a list). It writes a no-JS `.ab-fallback` list
+    (each item with a hidden `.ab-person` JSON) and a hidden `.ab-data` with
+    `avatar@` / `source@` values. `AUTHORS_API_HOST` and the role list are constants at
+    the top of the template — keep the role prefixes in sync with `authorbadge.json`.
+  - `src/`: `index.ts` mounts every `.ab-root` (dedupes, sorts by role order, puts
+    `avatar@` pictures on the legacy author's card), `card.ts`, `carousel.ts`
+    (scroll-snap row + Previous/Next, disabled at the ends, hidden when all fits),
+    `config.ts`/`settings.ts` (`authorbadge.json`: label, role labels/order, which card
+    parts show, source label; bundled + re-read at runtime like pagesetting).
+  - All links open in a new tab (`rel=noopener`, sr-only "(opens in a new tab)");
+    only http(s) URLs become links. Same WCAG rules as pagesetting.
+  - `loader.html` loads the dist files only on pages with a badge (`.ab-root`); dev
+    switch `localStorage.abDev`. `currentdeki.dekiscript` is the old badge, kept for
+    reference. `demo.html` shows the cases.
+
 ## Commands (run in `pagesetting/`)
 
 - `npm install` — once, installs esbuild and typescript.

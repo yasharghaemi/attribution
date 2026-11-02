@@ -1,0 +1,22 @@
+{
+  "label": "Authors and contributors",
+  "roles": [
+    { "prefix": "authorname:", "label": "Author" },
+    { "prefix": "author@", "label": "Author" },
+    { "prefix": "editor@", "label": "Editor" },
+    { "prefix": "remixer@", "label": "Remixer" },
+    { "prefix": "translator@", "label": "Translator" },
+    { "prefix": "contributor@", "label": "Contributor" },
+    { "prefix": "illustrator@", "label": "Illustrator" },
+    { "prefix": "reviewedBy@", "label": "Reviewer" },
+    { "prefix": "bookauthor@", "label": "Book Author" },
+    { "prefix": "bookeditor@", "label": "Book Editor" },
+    { "prefix": "bookremixer@", "label": "Book Remixer" },
+    { "prefix": "booktranslator@", "label": "Book Translator" },
+    { "prefix": "bookcontributor@", "label": "Book Contributor" },
+    { "prefix": "bookillustrator@", "label": "Book Illustrator" },
+    { "prefix": "bookreviewedBy@", "label": "Book Reviewer" }
+  ],
+  "show": { "picture": true, "role": true, "campus": true, "program": true },
+  "sourceLabel": "Source"
+}

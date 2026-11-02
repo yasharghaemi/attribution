@@ -1,0 +1,16 @@
+{
+  "name": "authorbadge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Author badge carousel for MindTouch pages (legacy authorname: and attribution tags)",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:sandbox": "node scripts/dev.mjs 0.0.0.0",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,13 +1,30 @@
 {
   "setupTasks": [
-    { "name": "Install build tools", "command": "cd pagesetting && npm install" }
+    {
+      "name": "Install build tools",
+      "command": "cd pagesetting && npm install"
+    },
+    {
+      "name": "Install author badge build tools",
+      "command": "cd authorbadge && npm install"
+    }
   ],
   "tasks": {
     "dev": {
       "name": "Page settings dev server",
       "command": "cd pagesetting && npm run dev:sandbox",
       "runAtStart": true,
-      "preview": { "port": 8000 }
+      "preview": {
+        "port": 8000
+      }
+    },
+    "authorbadge-dev": {
+      "name": "Author badge dev server",
+      "command": "cd authorbadge && npm run dev:sandbox",
+      "runAtStart": true,
+      "preview": {
+        "port": 8001
+      }
     }
   }
 }

@@ -1,0 +1,91 @@
+/***
+ * Template:Custom/Views/AuthorBadge - the modern author badge.
+ *
+ * Replaces the old badge (currentdeki.dekiscript): call it where the old one was.
+ * Reads the page's author tags - the legacy authorname:<key> plus the attribution tags
+ * (author@, editor@, ..., and the book* ones) - looks each key up on the authors API
+ * (on the server, cached 24h; an outage never breaks the page) and writes:
+ *   - .ab-fallback: a plain list that shows when the script doesn't run. Each item
+ *     carries the person's data as JSON in a hidden .ab-person element;
+ *   - .ab-data (hidden): avatar@ pictures and source@ values.
+ * authorbadge.min.js (loaded by authorbadge/loader.html) turns it into a carousel.
+ *
+ * The API may answer one key with several people: { author: {...} },
+ * { authors: [ ... ] } or a plain list are all accepted.
+ ***/
+
+var AUTHORS_API_HOST = "https://knitcanvas.fun";
+
+// Tags that make badges, in display order. Keep the prefixes in sync with "roles" in
+// authorbadge.json (the labels here are only for the no-script list).
+var ROLES = [
+    { prefix: "authorname:", label: "Author" },
+    { prefix: "author@", label: "Author" },
+    { prefix: "editor@", label: "Editor" },
+    { prefix: "remixer@", label: "Remixer" },
+    { prefix: "translator@", label: "Translator" },
+    { prefix: "contributor@", label: "Contributor" },
+    { prefix: "illustrator@", label: "Illustrator" },
+    { prefix: "reviewedBy@", label: "Reviewer" },
+    { prefix: "bookauthor@", label: "Book Author" },
+    { prefix: "bookeditor@", label: "Book Editor" },
+    { prefix: "bookremixer@", label: "Book Remixer" },
+    { prefix: "booktranslator@", label: "Book Translator" },
+    { prefix: "bookcontributor@", label: "Book Contributor" },
+    { prefix: "bookillustrator@", label: "Book Illustrator" },
+    { prefix: "bookreviewedBy@", label: "Book Reviewer" }
+];
+
+var tagList = map.keyvalues(page.tags);
+
+<div class="ab-root">
+    <ul class="ab-fallback">
+    foreach (var role in ROLES) {
+        foreach (var tag in tagList where string.startswith(tag.value.name, role.prefix, true)) {
+            var key = string.replace(tag.value.name, role.prefix, "", true);
+            if (key != "" && key != "ck12") {
+                // nilIfMissing=true: a failed call gives nil, and the key is shown instead.
+                var data = web.json(AUTHORS_API_HOST .. "/api/v1/authors/key/" .. key, 86400, true);
+                var found = data is list ? data
+                    : (data is map && data.err == false
+                        ? (data.authors is list ? data.authors : (data.author is map ? [ data.author ] : []))
+                        : []);
+                var persons = list.count(found) > 0 ? found : [ { name: key } ];
+                foreach (var p in persons) {
+                    <li>
+                        if (p.nameURL) {
+                            <a href=(p.nameURL) target="_blank" rel="noopener"> p.name ?? key </a>
+                        } else {
+                            p.name ?? key
+                        }
+                        " (" .. role.label .. ")"
+                        if (p.campusName) {
+                            ", " .. p.campusName
+                        }
+                        <span class="ab-person" hidden="hidden"> json.emit({
+                            role: role.prefix,
+                            key: key,
+                            name: p.name ?? key,
+                            nameURL: p.nameURL ?? "",
+                            pictureURL: p.pictureURL ?? "",
+                            pictureCircle: p.pictureCircle ?? "",
+                            campusName: p.campusName ?? "",
+                            campusURL: p.campusURL ?? "",
+                            programName: p.programName ?? "",
+                            programURL: p.programURL ?? ""
+                        }) </span>
+                    </li>
+                }
+            }
+        }
+    }
+    </ul>
+    <div class="ab-data" hidden="hidden">
+        foreach (var tag in tagList where string.startswith(tag.value.name, "avatar@", true)) {
+            <span class="ab-avatar"> string.replace(tag.value.name, "avatar@", "", true) </span>
+        }
+        foreach (var tag in tagList where string.startswith(tag.value.name, "source@", true)) {
+            <span class="ab-source"> string.replace(tag.value.name, "source@", "", true) </span>
+        }
+    </div>
+</div>
