@@ -5,7 +5,8 @@ export const DEKI_HEADERS: Record<string, string> = {
   'X-Deki-Client': 'mindtouch-martian',
   'X-Deki-Requested-With': 'XMLHttpRequest',
 };
-export const AUTHORS_API = 'https://knitcanvas.fun/api/v1/authors/search';
+// Host from AUTHORS_API_HOST in .env, set at build time (scripts/env.mjs).
+export const AUTHORS_API = `${__AUTHORS_API_HOST__}/api/v1/authors/search`;
 export const OVERVIEW_PROPERTY = 'mindtouch.page#overview';
 export const THUMBNAIL_FILE = 'mindtouch.page#thumbnail';
 export const NOT_SET = 'not-set';

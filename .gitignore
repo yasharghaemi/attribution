@@ -17,3 +17,6 @@ Thumbs.db
 .document/*
 # Local dev server output (npm run dev)
 .dev/
+
+# Build-time settings (pagesetting/.env); .env.example is committed
+.env

@@ -36,7 +36,14 @@ this GitHub repo through jsDelivr. There is no server code here.
 - `npm run build` — minified, ASCII-only `dist/pagesetting.min.js` (IIFE, ES2019,
   with source map), `dist/pagesetting.min.css`, and a checked copy of
   `pagesetting.json` as `dist/pagesetting.json` (build fails if it isn't valid JSON).
-- `npm run watch` — rebuild the JS on change.
+- `npm run watch` — same as `npm run dev`.
+- **Build-time settings** come from `pagesetting/.env` (git-ignored; copy
+  `.env.example`), read by `scripts/env.mjs` for both `npm run build`
+  (`scripts/build.mjs`) and `npm run dev`, and written into the bundle with esbuild
+  `define` (a browser can't read `.env`). `AUTHORS_API_HOST` = host of the authors
+  search API (`AUTHORS_API` in `config.ts` = `<host>/api/v1/authors/search`; default
+  `https://knitcanvas.fun`). It is baked into the committed `dist/`, so build releases
+  with the intended `.env`.
 - `npm run dev` — local dev server at `http://localhost:8000` (unminified
   `pagesetting.js` / `pagesetting.css` rebuilt on save, plus `pagesetting.json` copied
   on save when valid; output in git-ignored `.dev/`).
@@ -159,7 +166,8 @@ loader's `BASE`; a branch URL (`@main`) is cached by jsDelivr for up to ~12 h.
   and multi-person author fields share the search box in `fields/authorSearch.ts`.
 - **Badges link to the tag search:** every badge (people in Attribution / Book
   attribution, chips in the Tags card) is a link (`tagLink` in `dom.ts`) to
-  `{site}/Special:Search?tags=<tag, URL-encoded>&type=wiki&query=`, opening in a new
+  `{current host}/Special:Search?tags=<tag, URL-encoded>&type=wiki&query=`, opening in
+  a new
   tab so unsaved editor work isn't lost (screen readers hear "opens in a new tab").
 - MindTouch API quirks: names containing `#` are double-encoded in paths
   (`util.enc`, e.g. `mindtouch.page%2523overview`); JSON responses give a single
@@ -179,7 +187,8 @@ loader's `BASE`; a branch URL (`@main`) is cached by jsDelivr for up to ~12 h.
   after switching to another listing type the card shows a "save and reopen" note.
   Shown to admins and editors, not authors. Reference HTML of MindTouch's panels
   (incl. `chapter-sample`) is in `.document/` (git-ignored).
-- Authors API: `https://knitcanvas.fun/api/v1/authors/search?q=<q>&limit=<n>` →
+- Authors API: `<AUTHORS_API_HOST>/api/v1/authors/search?q=<q>&limit=<n>` (host from
+  `.env`, default `https://knitcanvas.fun`) →
   `{ err, authors: [{ nameKey, name, campusName, isGroup }] }`.
 - **Accessibility (WCAG 2.2 AA):** keep text at 4.5:1 and UI edges/icons at 3:1. The
   accent is `#1565c0` (old `#1e88e5` failed), "Saved" green `#256b29`; inputs,

@@ -3,6 +3,7 @@
 // pagesetting.json, from .dev/ on port 8000. See loader.html for using it on the site.
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
+import { buildDefines } from './env.mjs';
 
 const host = process.argv[2] || 'localhost';
 
@@ -14,6 +15,7 @@ const ctx = await esbuild.context({
   sourcemap: true,
   entryNames: 'pagesetting',
   outdir: '.dev',
+  define: buildDefines(), // from .env, like the release build
   logLevel: 'info',
 });
 await ctx.watch();

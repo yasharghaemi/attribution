@@ -23,8 +23,8 @@ export function labelled(text: string, control: HTMLElement, id: string): HTMLDi
 
 /**
  * A badge's text as a link to the site's search for pages with that tag, e.g.
- * /Special:Search?tags=translator%40yashar-ghaemi&type=wiki&query=. Opens in a new tab
- * so unsaved edits in the editor aren't lost; screen readers are told so.
+ * {current host}/Special:Search?tags=translator%40yashar-ghaemi&type=wiki&query=. Opens
+ * in a new tab so unsaved edits in the editor aren't lost; screen readers are told so.
  */
 export function tagLink(tag: string, text: string): HTMLAnchorElement {
   const link = el('a', 'cps-chip-text cps-chip-link', text);
