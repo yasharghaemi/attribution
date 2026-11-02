@@ -20,3 +20,7 @@ Thumbs.db
 
 # Build-time settings (pagesetting/.env); .env.example is committed
 .env
+
+CLAUDE.md
+.claude/
+.claude/*
