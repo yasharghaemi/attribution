@@ -4,6 +4,8 @@
 
   The JS and CSS are downloaded only when the editor's #mt-summary appears, so
   normal page views load nothing; the browser caches both files after that.
+  In reader view (?readerView in the URL) nothing is loaded and MindTouch's own
+  Page settings are hidden as well.
   After each push, replace the commit hash in RELEASE with the new one.
 
   Dev mode (only for your own browser): start a dev server, then in the browser
@@ -64,6 +66,13 @@
         }
       });
     } catch (e) { /* no live updates */ }
+  }
+
+  // Reader view (?readerView in the URL): no Page settings at all - load nothing and
+  // hide MindTouch's own panel too.
+  if (/[?&]readerview(=|&|$)/i.test(location.search)) {
+    add('style', { textContent: '#mt-summary{display:none!important}' });
+    return;
   }
 
   if (document.getElementById('mt-summary')) return load();

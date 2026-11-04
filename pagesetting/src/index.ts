@@ -31,8 +31,12 @@ const tryMount = () => {
     settingsReady.then(() => mount(original, data));
   }
 };
-new MutationObserver(tryMount).observe(document.documentElement, { childList: true, subtree: true });
-tryMount();
+// No Page settings in reader view (?readerView in the URL, any case or value).
+const readerView = Array.from(new URLSearchParams(location.search).keys()).some((k) => k.toLowerCase() === 'readerview');
+if (!readerView) {
+  new MutationObserver(tryMount).observe(document.documentElement, { childList: true, subtree: true });
+  tryMount();
+}
 
 // #cps-data holds the template's settings as a JSON object in its text.
 function mount(original: HTMLElement, data: HTMLElement) {
